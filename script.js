@@ -12,6 +12,7 @@ form.addEventListener("submit", (e) => {
     e.preventDefault()
     let valid = true
     
+
     limparErros()
     
 
@@ -34,8 +35,7 @@ form.addEventListener("submit", (e) => {
     }
 
     //Verifica se a senha está preenchida
-    if( !validatePassword(passwordInput.value,8)){
-        criaErro(passwordInput,"A Senha precisa ter no minimo 8 digitos")
+    if( !validatePassword(passwordInput.value)){
         valid = false
     }
 
@@ -62,11 +62,22 @@ form.addEventListener("submit", (e) => {
         valid = false
     }
 
-    //Se todos os Campos estiverem preenchido, o form será enviado
+    //Envio do forms
     if(valid){
 
+        const dados = {
+            nome: nameInput.value,
+            email: emailInput.value,
+            password: passwordInput.value,
+            cpf: cpfInput.value,
+            genero: generoSelect.value,
+            mensagem: messageTextArea.value,
+        }
+
         desabilitarForm(true)
-    popup.style.display = "block"
+        popup.style.display = "block"
+
+        salvarDados(dados)
 
     setTimeout(()=>{
         desabilitarForm(false)
@@ -79,6 +90,12 @@ form.addEventListener("submit", (e) => {
     
 
 })
+
+function salvarDados(novoDado){
+    let dados = JSON.parse(localStorage.getItem('cadastrados')) || []
+    dados.push(novoDado)
+    localStorage.setItem('cadastrados',JSON.stringify(dados))
+}
 
 function desabilitarForm(disabled){
     const campos = form.querySelectorAll('input, select,textarea, button')
@@ -101,14 +118,54 @@ function isEmailValid(email){
 
 //função q valida a senha
 
-function validatePassword(password, minDigits){
-    if(password.length >= minDigits){
+function validatePassword(password){
+    const senhaLimpa = String(password || '').trim()
+
+    function valida(){
+        if(!senhaLimpa){
+            criaErro(passwordInput, 'Campo Senha precisa está preenchido')
+            return false
+        }
+        if(senhaLimpa.length < 6 || senhaLimpa.length > 12){
         //senha valida
+        criaErro(passwordInput, 'A Senha Precisa ter entre 6 e 12 Caracteres')
+        return false
+        }
+        if(!passwordLetras(senhaLimpa)){
+            criaErro(passwordInput,'A Senha precisa ter pelo menos uma letra')
+            return false
+        }
+        if(!passwordNumbers(senhaLimpa)){
+            criaErro(passwordInput,'A Senha precisa ter pelo menos um numero')
+            return false
+        }
         return true
     }
 
+    //Contém Numeros
+    function passwordNumbers(senha){
+        const RegexSenhaNumbers = /\d/ 
+
+        if(RegexSenhaNumbers.test(senha)){
+            return true
+        }
+        return false
+    }
+
+    //Letra Maiuscula
+    function passwordLetras(senha){
+        const RegexSenhaLetras = new RegExp(
+            /[a-zA-Z]/
+        )
+
+        if(RegexSenhaLetras.test(senha)){
+            return true
+        }
+        return false
+    }
+    
     //senha invalida
-    return false
+    return valida()
 }
 
 function validateName(name){
@@ -177,5 +234,4 @@ function validateCPF(cpf){
 
     return valida()
 }
-
 

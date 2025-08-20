@@ -127,7 +127,6 @@ function validatePassword(password){
             return false
         }
         if(senhaLimpa.length < 6 || senhaLimpa.length > 12){
-        //senha valida
         criaErro(passwordInput, 'A Senha Precisa ter entre 6 e 12 Caracteres')
         return false
         }
@@ -164,7 +163,7 @@ function validatePassword(password){
         return false
     }
     
-    //senha invalida
+
     return valida()
 }
 
